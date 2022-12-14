@@ -1,0 +1,51 @@
+# !!!NOTE: this yaml file is just a TEMPLATE for other projects to initialize logger.
+# all the configs below won't be effective in any other projects using logger.
+LogCfg:
+  # 'json' or 'pretty'. If type is 'json' then the output format is json.
+  # If type is 'pretty' then the output format is human friendly format.
+  Type: pretty
+
+  # global log level.
+  Level: info
+
+  # the module log level. If the module is not present, the global level will be applied to.
+  ModuleLevels:
+    ledger: info
+    consensus: info
+
+  # Rotation contains configs for log rotation.
+  Rotation:
+    # Enabled indicates whether enable the log rotation. If it is false, the log will be
+    # written to stderr.
+    Enabled: true
+
+    # Filename is the file to write logs to.  Backup log files will be retained
+    # in the same directory.  It uses wnode.log in
+    # os.TempDir() if empty.
+    Filename: /opt/wnode/log/wnode.log
+
+    # MaxSize is the maximum size in megabytes of the log file before it gets
+    # rotated. It defaults to 100 megabytes. It must be positive number,
+    # otherwise default number will be used.
+    MaxSize: 20
+
+    # MaxAge is the maximum number of days to retain old log files based on the
+    # timestamp encoded in their filename.  Note that a day is defined as 24
+    # hours and may not exactly correspond to calendar days due to daylight
+    # savings, leap seconds, etc. The default is not to remove old log files
+    # based on age. It must be positive number, otherwise default number will be used.
+    MaxAge: 30
+
+    # MaxBackups is the maximum number of old log files to retain.  The default
+    # is to retain all old log files (though MaxAge may still cause them to get
+    # deleted). It must be positive number, otherwise default number will be used.
+    MaxBackups: 50
+
+    # LocalTime determines if the time used for formatting the timestamps in
+    # backup files is the computer's local time.  The default is to use UTC
+    # time.
+    LocalTime: true
+
+    # Compress determines if the rotated log files should be compressed
+    # using gzip. The default is not to perform compression.
+    Compress: true

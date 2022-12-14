@@ -1,0 +1,38 @@
+chain_id: bcs-2n7xka-3f771e976
+client:
+  
+  
+  type: ecdsa_with_sha256
+  identity:
+    keyPath: C:\Users\HuJie\Desktop\Testing\configuration\orgcerts\certificate-w0hv3kwia\user_sign.key
+    certPath: C:\Users\HuJie\Desktop\Testing\configuration\orgcerts\certificate-w0hv3kwia\user_sign.crt
+  tls:
+    enable: true
+    keyPath: C:\Users\HuJie\Desktop\Testing\configuration\orgcerts\certificate-w0hv3kwia\user_tls.key
+    certPath: C:\Users\HuJie\Desktop\Testing\configuration\orgcerts\certificate-w0hv3kwia\user_tls.crt
+    rootPath:
+      
+      - C:\Users\HuJie\Desktop\Testing\configuration\orgcerts\certificate-w0hv3kwia\ca_tls.crt
+      
+
+nodes:
+  
+  
+  
+  node-0.certificate-w0hv3kwia:
+    hostOverride: node-0.certificate-w0hv3kwia.svc.cluster.local
+    host: 123.249.97.248
+    port: 30605
+  
+  node-1.certificate-w0hv3kwia:
+    hostOverride: node-1.certificate-w0hv3kwia.svc.cluster.local
+    host: 123.249.97.248
+    port: 30608
+  
+  node-2.certificate-w0hv3kwia:
+    hostOverride: node-2.certificate-w0hv3kwia.svc.cluster.local
+    host: 123.249.97.248
+    port: 30611
+  
+  
+  
