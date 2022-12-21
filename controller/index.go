@@ -5,11 +5,11 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"regexp"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -30,7 +30,7 @@ type Deposit struct {
 	Phone     string `db:"phone"`
 	TimeStamp int64  `db:"timestamp"`
 	IsModify  bool   `db:"ismodify"`
-	DataKey   []byte `db:"datakey"`
+	DataKey   string `db:"datakey"`
 }
 
 // 加密密钥
@@ -88,14 +88,17 @@ func UpChain(c *gin.Context) *response.Response {
 			timestampbyte := make([]byte, 8)
 			binary.BigEndian.PutUint64(timestampbyte, uint64(timestamp))
 			headers := bytes.Join([][]byte{[]byte(phone), timestampbyte}, []byte{})
-			datakey := sha256.Sum256(headers)
+			datakeySha := sha256.Sum256(headers)
+			datakey := hex.EncodeToString(datakeySha[:])
+
 
 			lock.Lock()
 			//上链存储
-			TxHashID, err := api.SaveRecode(phone, strconv.FormatInt(timestamp, 10), cyptdata)
+			//TxHashID, err := api.SaveRecode(phone, strconv.FormatInt(timestamp, 10), cyptdata)
+			TxHashID, err := api.SaveRecode(datakey,cyptdata)
 			//本地存储
+			//Db.Exec("insert into deposit(txhash,phone,timestamp,datakey,ismodify)values(?,?,?,?,?)", TxHashID, phone, timestamp, datakey, false)
 			Db.Exec("insert into deposit(txhash,phone,timestamp,datakey,ismodify)values(?,?,?,?,?)", TxHashID, phone, timestamp, datakey, false)
-
 			//删除对应缓存
 			Conn.Do("DEL", phone)
 			Conn.Do("DEL", TxHashID)
@@ -243,19 +246,33 @@ func Modify(c *gin.Context) *response.Response {
 		go func() {
 			//数据加密
 			cyptdata := crypto.FromString(data).SetKey(Key).Aes().ECB().PKCS7Padding().Encrypt().ToBase64String()
-			timestamp := time.Now().Unix()
+			//timestamp := time.Now().Unix()
 
 			lock.Lock()
 			//先验证手机号和交易hash对应的东西是否存在
 			var deposit []Deposit
 			Db.Select(&deposit, "select txhash,phone,timestamp,ismodify from deposit where txhash=? and phone=?", hash, phone)
+			fmt.Println("---------------------------")
+			fmt.Println(deposit)
 			if len(deposit) == 0 {
 				ResponseChannel <- response.Resp().Json(gin.H{"status": 603, "data": "", "msg": "该条信息不存在"})
 			} else {
 				//数据修改
-				TxHashID, err := api.ChangeRecode(phone, strconv.FormatInt(timestamp, 10), cyptdata)
+				//TxHashID, err := api.ChangeRecode(phone, strconv.FormatInt(timestamp, 10), cyptdata)
+
+				//生成datakey，即手机号+时间戳的hash
+				timestamp := time.Now().Unix()
+				timestampbyte := make([]byte, 8)
+				binary.BigEndian.PutUint64(timestampbyte, uint64(timestamp))
+				headers := bytes.Join([][]byte{[]byte(phone), timestampbyte}, []byte{})
+				datakeysha := sha256.Sum256(headers)
+				datakey := hex.EncodeToString(datakeysha[:])
+			
+
+				TxHashID, err := api.ChangeRecode(datakey, cyptdata)
 				//本地数据更新
-				Db.Exec("insert into deposit(txhash,phone,timestamp,ismodify)values(?,?,?,?)", TxHashID, phone, timestamp, false)
+				//Db.Exec("insert into deposit(txhash,phone,timestamp,ismodify)values(?,?,?,?)", TxHashID, phone, timestamp, false)
+				Db.Exec("insert into deposit(txhash,phone,timestamp,datakey,ismodify)values(?,?,?,?,?)", TxHashID, phone, timestamp, datakey, false)
 				Db.Exec("update deposit set ismodify=? where txhash=?", true, hash)
 				//删除对应缓存
 				Conn.Do("DEL", phone)

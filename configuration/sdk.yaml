@@ -19,19 +19,19 @@ nodes:
   
   
   
-  node-0.certificate-w0hv3kwia:
-    hostOverride: node-0.certificate-w0hv3kwia.svc.cluster.local
-    host: 123.249.97.248
+  node-0.organization-b4fydwesq:
+    hostOverride: node-0.organization-b4fydwesq.svc.cluster.local
+    host: 124.70.76.98
     port: 30605
   
-  node-1.certificate-w0hv3kwia:
-    hostOverride: node-1.certificate-w0hv3kwia.svc.cluster.local
-    host: 123.249.97.248
+  node-1.organization-b4fydwesq:
+    hostOverride: node-1.organization-b4fydwesq.svc.cluster.local
+    host: 124.70.76.98
     port: 30608
   
-  node-2.certificate-w0hv3kwia:
-    hostOverride: node-2.certificate-w0hv3kwia.svc.cluster.local
-    host: 123.249.97.248
+  node-2.organization-b4fydwesq:
+    hostOverride: node-2.organization-b4fydwesq.svc.cluster.local
+    host: 124.70.76.98
     port: 30611
   
   

@@ -32,11 +32,11 @@ func init() {
 	appConfig.ConfigFilePath = "C:\\Users\\HuJie\\Desktop\\Testing\\configuration\\sdk.yaml"
 	appConfig.ContractName = "example01"
 
-	//背书节点名称node-2.certificate-w0hv3kwia
-	appConfig.EndorserNodes = "node-0.certificate-w0hv3kwia,node-1.certificate-w0hv3kwia,node-2.certificate-w0hv3kwia"
+	//背书节点名称node-2.organization-b4fydwesq
+	appConfig.EndorserNodes = "node-0.organization-b4fydwesq,node-1.organization-b4fydwesq,node-2.organization-b4fydwesq"
 	//共识节点名称
-	appConfig.ConsensusNode = "node-0.certificate-w0hv3kwia"
-	appConfig.QueryNode = "node-0.certificate-w0hv3kwia"
-	appConfig.ChainID = "bcs-2n7xka-3f771e976"
+	appConfig.ConsensusNode = "node-0.organization-b4fydwesq"
+	appConfig.QueryNode = "node-0.organization-b4fydwesq"
+	appConfig.ChainID = "bcs-z9z53b-c52cc9548"
 	SetSignAlg(appConfig)
 }
