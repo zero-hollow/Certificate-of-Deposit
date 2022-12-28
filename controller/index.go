@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	
 	"net/http"
 	"regexp"
 	"strings"
@@ -76,8 +77,11 @@ func UpChain(c *gin.Context) *response.Response {
 	cCp := c.Copy()
 	fmt.Println(cCp)
 	//校验数据有效性
-	phone := cCp.Query("phone")
-	data := cCp.Query("data")
+	// phone := cCp.Query("phone")
+	// data := cCp.Query("data")
+	phone := c.PostForm("phone")
+	data := c.PostForm("data")
+	
 	if verifyMobileFormat(phone) && json.Valid([]byte(data)) {
 		go func() {
 			//数据加密
@@ -91,11 +95,10 @@ func UpChain(c *gin.Context) *response.Response {
 			datakeySha := sha256.Sum256(headers)
 			datakey := hex.EncodeToString(datakeySha[:])
 
-
 			lock.Lock()
 			//上链存储
 			//TxHashID, err := api.SaveRecode(phone, strconv.FormatInt(timestamp, 10), cyptdata)
-			TxHashID, err := api.SaveRecode(datakey,cyptdata)
+			TxHashID, err := api.SaveRecode(datakey, cyptdata)
 			//本地存储
 			//Db.Exec("insert into deposit(txhash,phone,timestamp,datakey,ismodify)values(?,?,?,?,?)", TxHashID, phone, timestamp, datakey, false)
 			Db.Exec("insert into deposit(txhash,phone,timestamp,datakey,ismodify)values(?,?,?,?,?)", TxHashID, phone, timestamp, datakey, false)
@@ -120,7 +123,13 @@ func UpChain(c *gin.Context) *response.Response {
 func QueryByPhone(c *gin.Context) *response.Response {
 	Db, _ := sqlx.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/credite")
 	defer Db.Close()
-	phone := c.Query("phone")
+
+
+	//phone := c.Query("phone")
+	phone := c.PostForm("phone")
+
+
+	
 	fmt.Println(phone)
 	//先在缓存中查找数据
 	r, _ := redis.String(Conn.Do("Get", phone))
@@ -172,7 +181,8 @@ func QueryByPhone(c *gin.Context) *response.Response {
 func QueryByHash(c *gin.Context) *response.Response {
 	Db, _ := sqlx.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/credite")
 	defer Db.Close()
-	hash := c.Query("hash")
+	// hash := c.Query("hash")
+	hash := c.PostForm("hash")
 	//先在缓存中查找数据
 	r, _ := redis.String(Conn.Do("Get", hash))
 	if r == "" {
@@ -237,11 +247,24 @@ func Modify(c *gin.Context) *response.Response {
 	Db, _ := sqlx.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/credite")
 	defer Db.Close()
 	//并发操作只能对副本进行
-	cCp := c.Copy()
+	//cCp := c.Copy()
 	//校验数据有效性
-	phone := cCp.Query("phone")
-	hash := cCp.Query("hash")
-	data := cCp.Query("data")
+	// phone := cCp.Query("phone")
+	// hash := cCp.Query("hash")
+	// data := cCp.Query("data")
+	// bodyByts, err := ioutil.ReadAll(c.Request.Body)
+	// c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyByts))
+	// if err != nil {
+	// // 返回错误信息
+	// c.String(http.StatusBadRequest, err.Error())
+	// // 执行退出
+	// c.Abort()
+	// }
+	phone := c.PostForm("phone")
+	hash := c.PostForm("hash")
+	data := c.PostForm("data")
+
+
 	if verifyMobileFormat(phone) && VerifyHashFormat(hash) && json.Valid([]byte(data)) {
 		go func() {
 			//数据加密
@@ -267,7 +290,6 @@ func Modify(c *gin.Context) *response.Response {
 				headers := bytes.Join([][]byte{[]byte(phone), timestampbyte}, []byte{})
 				datakeysha := sha256.Sum256(headers)
 				datakey := hex.EncodeToString(datakeysha[:])
-			
 
 				TxHashID, err := api.ChangeRecode(datakey, cyptdata)
 				//本地数据更新
