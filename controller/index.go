@@ -123,13 +123,8 @@ func UpChain(c *gin.Context) *response.Response {
 func QueryByPhone(c *gin.Context) *response.Response {
 	Db, _ := sqlx.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/credite")
 	defer Db.Close()
-
-
-	//phone := c.Query("phone")
-	phone := c.PostForm("phone")
-
-
-	
+	phone := c.Query("phone")
+	//phone := c.PostForm("phone")
 	fmt.Println(phone)
 	//先在缓存中查找数据
 	r, _ := redis.String(Conn.Do("Get", phone))
@@ -181,8 +176,8 @@ func QueryByPhone(c *gin.Context) *response.Response {
 func QueryByHash(c *gin.Context) *response.Response {
 	Db, _ := sqlx.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/credite")
 	defer Db.Close()
-	// hash := c.Query("hash")
-	hash := c.PostForm("hash")
+	hash := c.Query("hash")
+	//hash := c.PostForm("hash")
 	//先在缓存中查找数据
 	r, _ := redis.String(Conn.Do("Get", hash))
 	if r == "" {
@@ -263,7 +258,6 @@ func Modify(c *gin.Context) *response.Response {
 	phone := c.PostForm("phone")
 	hash := c.PostForm("hash")
 	data := c.PostForm("data")
-
 
 	if verifyMobileFormat(phone) && VerifyHashFormat(hash) && json.Valid([]byte(data)) {
 		go func() {
